@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SGA — Sistema Gestão Acadêmica</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">SGA</div>
+            <div class="brand-text">Sistema Acadêmico</div>
+        </div>
+
+        <nav class="menu timeline-menu">
+
+            <div class="timeline-item home-item" data-page="dashboard" onclick="showPage('dashboard')">
+                <div class="timeline-icon home-dot"></div>
+                <span>Início</span>
+            </div>
+
+
+
+            <div class="timeline-item" data-page="cursos" onclick="showPage('cursos')">
+                <span class="timeline-number">1</span>
+                <span>Cursos</span>
+            </div>
+
+            <div class="timeline-item" data-page="professores" onclick="showPage('professores')">
+                <span class="timeline-number">2</span>
+                <span>Professores</span>
+            </div>
+
+            <div class="timeline-item" data-page="turmasPage" onclick="showPage('turmasPage')">
+                <span class="timeline-number">3</span>
+                <span>Turmas</span>
+            </div>
+
+            <div class="timeline-item" data-page="alunos" onclick="showPage('alunos')">
+                <span class="timeline-number">4</span>
+                <span>Alunos</span>
+            </div>
+
+            <div class="timeline-item" data-page="notas" onclick="showPage('notas')">
+                <span class="timeline-number">5</span>
+                <span>Notas</span>
+            </div>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+            <button class="theme-btn" onclick="toggleTheme()">🌓 Tema</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="page active">
+            <div class="welcome-card">
+                <h1>Bem-vindo ao SGA</h1>
+                <p>Use o menu à esquerda para gerenciar Alunos, Cursos e Professores.</p>
+
+                <div class="dashboard-cards">
+                    <div class="card small">
+                        <h4>Total Alunos</h4>
+                        <p id="countAlunos">—</p>
+                    </div>
+                    <div class="card small">
+                        <h4>Total Cursos</h4>
+                        <p id="countCursos">—</p>
+                    </div>
+                    <div class="card small">
+                        <h4>Total Turmas</h4>
+                        <p id="countTurmas">—</p>
+                    </div>
+
+                    <div class="card small">
+                        <h4>Total Professores</h4>
+                        <p id="countProfs">—</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALUNOS -->
+        <section id="alunos" class="page">
+            <h2>Gerenciar Alunos</h2>
+
+            <div class="card wide">
+                <h3>Cadastrar / Editar Aluno</h3>
+
+                <form id="formAluno" class="form-grid">
+                    <input type="hidden" id="alunoId">
+
+                    <div class="col">
+                        <label for="alunoNome">Nome</label>
+                        <input id="alunoNome" type="text" required>
+                    </div>
+
+                    <div class="col">
+                        <label for="alunoEmail">Email</label>
+                        <input id="alunoEmail" type="email" required>
+                    </div>
+
+                    <div class="col">
+                        <label for="alunoCurso">Curso</label>
+                        <select id="alunoCurso"></select>
+                    </div>
+
+                    <div class="col">
+                        <label for="alunoProfessor">Professor</label>
+                        <select id="alunoProfessor"></select>
+                    </div>
+
+                    <!-- 🔥 NOVO CAMPO: TURMA -->
+                    <div class="col">
+                        <label for="turmaSelect">Turma</label>
+                        <select id="turmaSelect">
+                            <option value="">— selecione —</option>
+                            <option value="A">A — Matutino</option>
+                            <option value="B">B — Noturno</option>
+                        </select>
+                    </div>
+
+                    <div class="actions" style="grid-column: 1 / -1;">
+                        <button class="btn primary" type="submit">💾 Salvar</button>
+                        <button class="btn ghost" type="button" onclick="resetAlunoForm()">Cancelar</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="card table-card">
+                <h3>Lista de Alunos</h3>
+                <table class="table" id="listaAlunos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Curso</th>
+                            <th>Turma</th>
+                            <th>Professor</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- CURSOS -->
+        <section id="cursos" class="page">
+            <h2>Gerenciar Cursos</h2>
+
+            <div class="card wide">
+                <h3>Cadastrar / Editar Curso</h3>
+                <form id="formCurso" class="form-grid single">
+                    <input type="hidden" id="cursoId">
+                    <div class="col">
+                        <label for="cursoNome">Nome do Curso</label>
+                        <input id="cursoNome" type="text" required>
+                    </div>
+
+                    <div class="actions" style="grid-column: 1 / -1;">
+                        <button class="btn primary" type="submit">💾 Salvar</button>
+                        <button class="btn ghost" type="button" onclick="resetCursoForm()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card table-card">
+                <h3>Lista de Cursos</h3>
+                <table class="table" id="listaCursos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- PROFESSORES -->
+        <section id="professores" class="page">
+            <h2>Gerenciar Professores</h2>
+
+            <div class="card wide">
+                <h3>Cadastrar / Editar Professor</h3>
+                <form id="formProfessor" class="form-grid single">
+                    <input type="hidden" id="professorId">
+                    <div class="col">
+                        <label for="professorNome">Nome</label>
+                        <input id="professorNome" type="text" required>
+                    </div>
+
+                    <div class="actions" style="grid-column: 1 / -1;">
+                        <button class="btn primary" type="submit">💾 Salvar</button>
+                        <button class="btn ghost" type="button" onclick="resetProfessorForm()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card table-card">
+                <h3>Lista de Professores</h3>
+                <table class="table" id="listaProfessores">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!--       TELA TURMAS     -->
+        <section id="turmasPage" class="page">
+
+            <h2>Gerenciar Turmas</h2>
+
+            <!-- FORMULÁRIO -->
+            <form id="formTurma" class="form-grid">
+                <input type="hidden" id="turmaId">
+
+                <div class="col">
+                    <label for="turmaNome">Nome da Turma</label>
+                    <input id="turmaNome" type="text" required placeholder="Ex: Turma A">
+                </div>
+
+                <div class="col">
+                    <label for="turmaCurso">Curso</label>
+                    <select id="turmaCurso" required></select>
+                </div>
+
+                <div class="col">
+                    <label for="turmaProfessor">Professor</label>
+                    <select id="turmaProfessor" required></select>
+                </div>
+
+                <div class="actions" style="grid-column:1/-1;">
+                    <button type="submit" class="btn primary">💾 Salvar Turma</button>
+                    <button type="button" class="btn ghost" onclick="resetTurmaForm()">Cancelar</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <!-- LISTAGEM -->
+            <h3>Turmas cadastradas</h3>
+
+            <table class="table" id="listaTurmasTable">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Professor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaTurmas"></tbody>
+            </table>
+
+        </section>
+
+
+
+        <!-- NOTAS -->
+        <section id="notas" class="page">
+            <h2>Lançamento de Notas</h2>
+
+            <div class="card wide">
+                <h3>Selecionar Turma</h3>
+
+                <select id="notasTurmaSelect">
+                    <option value="">— selecione —</option>
+                </select>
+            </div>
+
+            <div class="card table-card" id="notasCard" style="display:none;">
+                <h3>Alunos do Curso</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Aluno</th>
+                            <th>Nota 1</th>
+                            <th>Nota 2</th>
+                            <th>Média</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notasTabelaBody"></tbody>
+                </table>
+
+                <button class="btn primary" style="margin-top:15px;" onclick="salvarNotasEmLote()">
+                    💾 Salvar Todas as Notas
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="config.js"></script>
+    <script src="turmas.js"></script>
+    <script src="notas.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
