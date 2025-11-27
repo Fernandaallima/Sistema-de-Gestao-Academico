@@ -97,16 +97,20 @@ async function salvarTurma(e) {
 
         if (!resp.ok) throw new Error("Erro ao salvar turma");
 
-        resetTurmaForm();
+        // Reseta formulário e mostra toast de edição salva
+        resetTurmaForm({ salvo: true });
+
+        // Atualiza tabelas e selects
         carregarTurmas();
         carregarCursosEmSelect();
         carregarProfessoresEmSelect();
 
     } catch (e) {
         console.error(e);
-        alert("Erro ao salvar turma.");
+        showMessage("❌ Erro ao salvar turma", "error");
     }
 }
+
 
 /* ---------- EDITAR ---------- */
 async function editarTurma(id) {
@@ -123,29 +127,63 @@ async function editarTurma(id) {
 
         showPage("turmasPage");
 
+        // Destaca formulário e mostra toast
+        const form = document.getElementById("formTurma");
+        form.classList.add("editing");
+        showMessage(`🖊️ Você está editando a turma "${t.nome}"`, "info");
+
     } catch (e) {
         console.error(e);
-        alert("Erro ao carregar turma.");
+        showMessage("❌ Erro ao carregar turma", "error");
     }
 }
 
+
 /* ---------- EXCLUIR ---------- */
 async function deletarTurma(id) {
-    if (!confirm("Confirmar exclusão da turma?")) return;
+    const ok = await confirmarBonito("Deseja realmente excluir esta turma?");
+    if (!ok) return;
 
-    await fetch(`${API_TURMAS}/${id}`, { method: "DELETE" });
+    try {
+        const resp = await fetch(`${API_TURMAS}/${id}`, { method: "DELETE" });
+        if (!resp.ok) throw new Error("Erro ao excluir turma");
 
-    carregarTurmas();           // atualiza tabela
-    carregarDropdownTurmas();   // FIX: evita ReferenceError
-    carregarDropdownAlunos();
-    carregarDropdownNotas();
+        // Atualiza tabelas corretamente
+        carregarTurmas();
+        carregarAlunos();          // Atualiza lista de alunos
+        carregarTurmasSelect();    // Atualiza select de turmas
+        showMessage("🗑️ Turma excluída com sucesso!", "success");
+    } catch (e) {
+        console.error(e);
+        showMessage("❌ Erro ao excluir turma", "error");
+    }
 }
+
+
+
+function cancelarEdicaoTurma() {
+    resetTurmaForm({ cancelado: true });
+}
+
 
 /* ---------- RESET ---------- */
-function resetTurmaForm() {
-    document.getElementById("formTurma").reset();
+function resetTurmaForm({ cancelado = false, salvo = false } = {}) {
+    const form = document.getElementById("formTurma");
+
+    const estavaEditando = form.classList.contains("editing");
+
+    form.reset();
     document.getElementById("turmaId").value = "";
+
+    form.classList.remove("editing");
+
+    if (cancelado && estavaEditando) {
+        showMessage("✖️ Edição cancelada", "info");
+    } else if (salvo && estavaEditando) {
+        showMessage("✅ Edição salva com sucesso!", "success");
+    }
 }
+
 
 
 

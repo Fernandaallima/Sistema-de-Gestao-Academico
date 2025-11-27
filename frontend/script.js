@@ -134,37 +134,29 @@ async function salvarAluno(e) {
   const id = document.getElementById("alunoId").value;
   const nome = document.getElementById("alunoNome").value;
   const email = document.getElementById("alunoEmail").value;
-  const turmaId = document.getElementById("turmaSelect").value;
+  const turma = document.getElementById("turmaSelect").value;
 
-  if (!nome || !email || !turmaId) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-
-  // Payload enviado ao backend
-  const payload = {
-    nome,
-    email,
-    turma: { id: Number(turmaId) },
-  };
+  if (!nome || !email) return alert("Preencha todos os campos!");
 
   const method = id ? "PUT" : "POST";
-  const url = id ? `${API_ALUNOS}/${id}` : `${API_ALUNOS}/completo`;
+  const url = id ? `${API_ALUNOS}/${id}` : API_ALUNOS;
 
-  const resp = await fetch(url, {
+  await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ nome, email, turmaId: turma }),
   });
 
-  if (!resp.ok) {
-    alert("Erro ao salvar aluno");
-    return;
-  }
-
-  resetAlunoForm();
+  // Atualiza tabela
   carregarAlunos();
+
+  // Reseta formulário e mostra mensagem de sucesso se estava editando
+  resetAlunoForm({ salvo: true });
+
+  // Se for novo aluno, mostrar mensagem específica
+  if (!id) showMessage("✅ Aluno adicionado com sucesso!", "success");
 }
+
 
 /**
  * Preenche o formulário com os dados do aluno a ser editado.
@@ -209,18 +201,8 @@ function editarAluno(id) {
 }
 
 function cancelarEdicaoAluno() {
-  const form = document.getElementById("formAluno");
-
-  // Limpa o formulário
-  resetAlunoForm();
-
-  // Remove destaque de edição
-  form.classList.remove("editing");
-
-  // Mostra mensagem de cancelamento
-  showMessage("✖️ Edição cancelada", "info");
+  resetAlunoForm({ cancelado: true });
 }
-
 
 
 
@@ -274,9 +256,7 @@ function confirmarBonito(msg = "Tem certeza?") {
   });
 }
 
-
-
-function resetAlunoForm() {
+function resetAlunoForm({ cancelado = false, salvo = false } = {}) {
   const form = document.getElementById("formAluno");
 
   // Detecta se estava editando
@@ -289,11 +269,14 @@ function resetAlunoForm() {
   // Remove classe de edição
   form.classList.remove("editing");
 
-  // Só mostra mensagem se realmente estava editando
-  if (estavaEditando) {
+  // Mensagens
+  if (cancelado && estavaEditando) {
     showMessage("✖️ Edição cancelada", "info");
+  } else if (salvo && estavaEditando) {
+    showMessage("✅ Edição salva com sucesso!", "success");
   }
 }
+
 
 
 
@@ -330,23 +313,61 @@ async function carregarCursos() {
     lista.map((c) => `<option value="${c.id}">${c.nome}</option>`).join("");
 }
 
+// Função para editar um curso
 async function editarCurso(id) {
-  const resp = await fetch(`${API_CURSOS}/${id}`);
-  const curso = await resp.json();
+  try {
+    const resp = await fetch(`${API_CURSOS}/${id}`);
+    const curso = await resp.json();
 
-  document.getElementById("cursoId").value = curso.id;
-  document.getElementById("cursoNome").value = curso.nome;
+    // Preenche formulário
+    document.getElementById("cursoId").value = curso.id;
+    document.getElementById("cursoNome").value = curso.nome;
 
-  showPage("cursos");
+    // Mostra a página de cursos
+    showPage("cursos");
+
+    // Mostra toast informativo
+    showMessage(`🖊️ Você está editando o curso "${curso.nome}"`, "info");
+
+    // Destaca o formulário
+    const form = document.getElementById("formCurso");
+    form.classList.add("editing");
+
+  } catch (err) {
+    console.error(err);
+    showMessage("❌ Erro ao carregar o curso", "error");
+  }
 }
 
+// Função para cancelar edição de curso
+function cancelarEdicaoCurso() {
+  const form = document.getElementById("formCurso");
+
+  // Limpa formulário
+  resetCursoForm();
+
+  // Remove destaque
+  form.classList.remove("editing");
+
+  // Mostra toast
+  showMessage("✖️ Edição cancelada", "info");
+}
+
+// Função para deletar um curso
 async function deletarCurso(id) {
-  if (!confirm("Deseja realmente excluir este curso?")) return;
+  const ok = await confirmarBonito("Deseja realmente excluir este curso?");
+  if (!ok) return;
 
-  await fetch(`${API_CURSOS}/${id}`, { method: "DELETE" });
-
-  carregarCursos();
+  try {
+    await fetch(`${API_CURSOS}/${id}`, { method: "DELETE" });
+    carregarCursos();
+    showMessage("🗑️ Curso excluído com sucesso!", "success");
+  } catch (err) {
+    console.error(err);
+    showMessage("❌ Erro ao excluir o curso", "error");
+  }
 }
+
 
 
 async function salvarCurso(e) {
@@ -354,6 +375,8 @@ async function salvarCurso(e) {
 
   const id = document.getElementById("cursoId").value;
   const nome = document.getElementById("cursoNome").value;
+
+  if (!nome) return alert("Informe o nome do curso");
 
   const method = id ? "PUT" : "POST";
   const url = id ? `${API_CURSOS}/${id}` : API_CURSOS;
@@ -364,14 +387,44 @@ async function salvarCurso(e) {
     body: JSON.stringify({ nome }),
   });
 
-  resetCursoForm();
+  // Atualiza a tabela
   carregarCursos();
+
+  // Reseta formulário e mostra mensagem de sucesso se estava editando
+  resetCursoForm({ salvo: true });
+
+  // Se for novo curso, você pode mostrar outra mensagem:
+  if (!id) showMessage("✅ Curso adicionado com sucesso!", "success");
 }
 
-function resetCursoForm() {
+
+function resetCursoForm({ cancelado = false, salvo = false } = {}) {
+  const form = document.getElementById("formCurso");
+
+  // Detecta se estava editando
+  const estavaEditando = form.classList.contains("editing");
+
+  // Limpa campos
+  form.reset();
   document.getElementById("cursoId").value = "";
-  document.getElementById("formCurso").reset();
+
+  // Remove destaque de edição
+  form.classList.remove("editing");
+
+  // Mensagens
+  if (cancelado && estavaEditando) {
+    showMessage("✖️ Edição cancelada", "info");
+  } else if (salvo && estavaEditando) {
+    showMessage("✅ Edição salva com sucesso!", "success");
+  }
 }
+
+
+function cancelarEdicaoCurso() {
+  resetCursoForm({ cancelado: true });
+}
+
+
 
 /* ============================================================
    SELECT DE TURMAS NO FORMULÁRIO DE ALUNO
@@ -445,33 +498,80 @@ async function salvarProfessor(e) {
     body: JSON.stringify({ nome }),
   });
 
-  resetProfessorForm();
+  // Atualiza a tabela
   carregarProfessores();
+
+  // Reseta o formulário e mostra mensagem de sucesso se estava editando
+  resetProfessorForm({ salvo: true });
 }
 
+
+// Função de edição de professor
 async function editarProfessor(id) {
-  const resp = await fetch(`${API_PROFS}/${id}`);
-  const prof = await resp.json();
+  try {
+    const resp = await fetch(`${API_PROFS}/${id}`);
+    const prof = await resp.json();
 
-  document.getElementById("professorId").value = prof.id;
-  document.getElementById("professorNome").value = prof.nome;
+    document.getElementById("professorId").value = prof.id;
+    document.getElementById("professorNome").value = prof.nome;
 
-  showPage("professores");
+    showPage("professores");
+
+    // Destaca o formulário como em edição
+    const form = document.getElementById("formProfessor");
+    form.classList.add("editing");
+
+    showMessage("🖊️ Você está editando o professor " + prof.nome, "info");
+  } catch (err) {
+    console.error(err);
+    showMessage("❌ Erro ao carregar o professor", "error");
+  }
 }
 
+// Função para cancelar edição do professor
+function cancelarEdicaoProfessor() {
+  resetProfessorForm({ cancelado: true });
+}
+
+
+// Função para deletar professor com confirmação bonita
 async function deletarProfessor(id) {
-  if (!confirm("Deseja realmente excluir este professor?")) return;
+  const ok = await confirmarBonito("Deseja realmente excluir este professor?");
+  if (!ok) return;
 
-  await fetch(`${API_PROFS}/${id}`, { method: "DELETE" });
-
-  carregarProfessores();
+  try {
+    await fetch(`${API_PROFS}/${id}`, { method: "DELETE" });
+    carregarProfessores();
+    showMessage("🗑️ Professor excluído com sucesso!", "success");
+  } catch (err) {
+    console.error(err);
+    showMessage("❌ Erro ao excluir o professor", "error");
+  }
 }
 
+// Função de reset do formulário de professor (igual ao padrão)
+function resetProfessorForm({ cancelado = false, salvo = false } = {}) {
+  const form = document.getElementById("formProfessor");
 
-function resetProfessorForm() {
+  // Detecta se estava editando
+  const estavaEditando = form.classList.contains("editing");
+
+  // Limpa os campos
+  form.reset();
   document.getElementById("professorId").value = "";
-  document.getElementById("formProfessor").reset();
+
+  // Remove destaque de edição
+  form.classList.remove("editing");
+
+  // Mostra mensagem conforme a ação
+  if (cancelado && estavaEditando) {
+    showMessage("✖️ Edição cancelada", "info");
+  } else if (salvo && estavaEditando) {
+    showMessage("✅ Edição salva com sucesso!", "success");
+  }
 }
+
+
 
 /* ============================================================
    Tema — Claro / Escuro
