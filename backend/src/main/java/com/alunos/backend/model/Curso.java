@@ -14,8 +14,12 @@ public class Curso {
 
     private String nome; // Nome do curso
 
-    @OneToMany(mappedBy = "curso", fetch = FetchType.EAGER)
-    // Um curso → várias turmas / "curso" é o dono na classe Turma
+    @OneToMany(
+            mappedBy = "curso",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    ) // Um curso → várias turmas / "curso" é o dono na classe Turma
     private List<Turma> turmas;
 
     public Curso() {} // Construtor padrão

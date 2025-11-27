@@ -28,6 +28,16 @@ public class Turma {
     @com.fasterxml.jackson.annotation.JsonIgnore // Evita serializar alunos
     private List<Aluno> alunos;
 
+
+    @OneToMany(
+            mappedBy = "turma",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnoreProperties({"turma"})
+    private List<Nota> notas;
+
+
     public Turma() {} // Construtor padrão
 
     public Long getId() { return id; } // Getter id

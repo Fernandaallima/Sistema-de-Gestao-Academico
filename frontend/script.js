@@ -229,6 +229,25 @@ async function carregarCursos() {
     lista.map((c) => `<option value="${c.id}">${c.nome}</option>`).join("");
 }
 
+async function editarCurso(id) {
+  const resp = await fetch(`${API_CURSOS}/${id}`);
+  const curso = await resp.json();
+
+  document.getElementById("cursoId").value = curso.id;
+  document.getElementById("cursoNome").value = curso.nome;
+
+  showPage("cursos");
+}
+
+async function deletarCurso(id) {
+  if (!confirm("Deseja realmente excluir este curso?")) return;
+
+  await fetch(`${API_CURSOS}/${id}`, { method: "DELETE" });
+
+  carregarCursos();
+}
+
+
 async function salvarCurso(e) {
   e.preventDefault();
 
@@ -328,6 +347,25 @@ async function salvarProfessor(e) {
   resetProfessorForm();
   carregarProfessores();
 }
+
+async function editarProfessor(id) {
+  const resp = await fetch(`${API_PROFS}/${id}`);
+  const prof = await resp.json();
+
+  document.getElementById("professorId").value = prof.id;
+  document.getElementById("professorNome").value = prof.nome;
+
+  showPage("professores");
+}
+
+async function deletarProfessor(id) {
+  if (!confirm("Deseja realmente excluir este professor?")) return;
+
+  await fetch(`${API_PROFS}/${id}`, { method: "DELETE" });
+
+  carregarProfessores();
+}
+
 
 function resetProfessorForm() {
   document.getElementById("professorId").value = "";

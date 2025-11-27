@@ -13,9 +13,14 @@ public class Professor {
 
     private String nome; // Nome do professor
 
-    @OneToMany(mappedBy = "professor") // Relacionamento 1:N com Turma
+    @OneToMany(
+            mappedBy = "professor",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    ) // Relacionamento 1:N com Turma
     @JsonIgnore // Evita loop de JSON
     private List<Turma> turmas; // Lista de turmas do professor
+
 
     public Professor() {} // Construtor padrão
 

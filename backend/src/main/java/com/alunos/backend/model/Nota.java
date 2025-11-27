@@ -1,6 +1,9 @@
 package com.alunos.backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 
 @Entity // Tabela "nota" no banco
 public class Nota {
