@@ -4,23 +4,25 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
-@Entity
-@JsonIgnoreProperties("turmas")
+@Entity // Indica que esta classe é uma tabela no banco
+@JsonIgnoreProperties("turmas") // Evita recursão no JSON (Curso → Turmas → Curso)
 public class Curso {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Chave primária
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremento
     private Long id;
 
-    private String nome;
+    private String nome; // Nome do curso
 
     @OneToMany(mappedBy = "curso", fetch = FetchType.EAGER)
+    // Um curso → várias turmas / "curso" é o dono na classe Turma
     private List<Turma> turmas;
 
-    public Curso() {}
+    public Curso() {} // Construtor padrão
 
-    public Curso(String nome) { this.nome = nome; }
+    public Curso(String nome) { this.nome = nome; } // Construtor auxiliar
 
+    // Getters e setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

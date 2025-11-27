@@ -60,7 +60,7 @@ public class AlunoController {
     }
 
     // ----------------------------------
-    // DELETE COMPLETO (Corrigido)
+    // DELETE COMPLETO
     // Remove aluno, notas e vínculos
     // ----------------------------------
     @DeleteMapping("/{id}")

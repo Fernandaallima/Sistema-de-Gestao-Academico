@@ -4,27 +4,27 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
-@Entity
+@Entity // Indica que a classe é uma entidade do banco
 public class Professor {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Chave primária
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremento
     private Long id;
 
-    private String nome;
+    private String nome; // Nome do professor
 
-    @OneToMany(mappedBy = "professor")
-    @JsonIgnore
-    private List<Turma> turmas;
+    @OneToMany(mappedBy = "professor") // Relacionamento 1:N com Turma
+    @JsonIgnore // Evita loop de JSON
+    private List<Turma> turmas; // Lista de turmas do professor
 
-    public Professor() {}
+    public Professor() {} // Construtor padrão
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { return id; } // Getter ID
+    public void setId(Long id) { this.id = id; } // Setter ID
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() { return nome; } // Getter nome
+    public void setNome(String nome) { this.nome = nome; } // Setter nome
 
-    public List<Turma> getTurmas() { return turmas; }
-    public void setTurmas(List<Turma> turmas) { this.turmas = turmas; }
+    public List<Turma> getTurmas() { return turmas; } // Getter turmas
+    public void setTurmas(List<Turma> turmas) { this.turmas = turmas; } // Setter turmas
 }

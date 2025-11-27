@@ -1,35 +1,32 @@
 package com.alunos.backend.model;
 
-// Importações necessárias para mapeamento JPA e controle de JSON
+// Importações para JPA e controle de JSON
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity // Indica que esta classe representa uma tabela no banco de dados
+@Entity // Esta classe vira uma tabela no banco
 public class Aluno {
 
     @Id // Chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremento no MySQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID auto-incremento
     private Long id;
 
-    private String nome;  // Nome do aluno
-    private String email; // Email do aluno
+    private String nome;   // Nome do aluno
+    private String email;  // Email do aluno
 
-    @ManyToOne // Muitos alunos pertencem a uma única turma
-    @JoinColumn(name = "turma_id") // Nome da coluna de chave estrangeira no banco
-    @JsonIgnoreProperties({"alunos"})
-    // Impede recursão infinita no JSON (Turma tem lista de alunos)
+    @ManyToOne // Muitos alunos → 1 turma
+    @JoinColumn(name = "turma_id") // FK no banco
+    @JsonIgnoreProperties({"alunos"}) // Evita loop no JSON
     private Turma turma;
 
-    // Construtor padrão exigido pelo Spring/JPA
-    public Aluno() {}
+    public Aluno() {} // Construtor padrão
 
-    // Construtor auxiliar para criar aluno mais facilmente
-    public Aluno(String nome, String email) {
+    public Aluno(String nome, String email) { // Construtor auxiliar
         this.nome = nome;
         this.email = email;
     }
 
-    // Getters e setters padrão
+    // Getters e setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -42,19 +39,13 @@ public class Aluno {
     public Turma getTurma() { return turma; }
     public void setTurma(Turma turma) { this.turma = turma; }
 
-    // =============================
-    // Helpers para JSON no frontend
-    // =============================
-    @Transient
-    // Este dado NÃO vira coluna no banco, apenas no JSON
+    @Transient // Não vira coluna no banco
     public Curso getCurso() {
-        // Retorna o curso da turma (relacionamento indireto)
-        return turma != null ? turma.getCurso() : null;
+        return turma != null ? turma.getCurso() : null; // Curso da turma
     }
 
     @Transient
     public Professor getProfessor() {
-        // Retorna o professor da turma (relacionamento indireto)
-        return turma != null ? turma.getProfessor() : null;
+        return turma != null ? turma.getProfessor() : null; // Professor da turma
     }
 }

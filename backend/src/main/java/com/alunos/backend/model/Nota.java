@@ -2,30 +2,30 @@ package com.alunos.backend.model;
 
 import jakarta.persistence.*;
 
-@Entity
+@Entity // Tabela "nota" no banco
 public class Nota {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Chave primária
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremento
     private Long id;
 
     // vincula a nota ao aluno
-    @ManyToOne
-    @JoinColumn(name = "aluno_id")
+    @ManyToOne // Muitas notas podem ser do mesmo aluno
+    @JoinColumn(name = "aluno_id") // FK aluno_id
     private Aluno aluno;
 
     // vincula a nota à turma
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
+    @ManyToOne // Muitas notas podem ser de uma mesma turma
+    @JoinColumn(name = "turma_id") // FK turma_id
     private Turma turma;
 
-    private Double nota1;
-    private Double nota2;
+    private Double nota1; // Primeira nota
+    private Double nota2; // Segunda nota
 
-    private Double media;
+    private Double media; // Média calculada
     private String status; // "APROVADO" ou "REPROVADO"
 
-    public Nota() {}
+    public Nota() {} // Construtor padrão
 
     // getters e setters
     public Long getId() { return id; }

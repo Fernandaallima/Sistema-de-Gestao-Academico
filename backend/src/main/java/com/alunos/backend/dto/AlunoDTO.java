@@ -1,13 +1,19 @@
 package com.alunos.backend.dto;
 
+// DTO usado para enviar dados simplificados do aluno ao frontend
 public class AlunoDTO {
+
+    // Campos que serão enviados como resposta
+    // Diferente do model Aluno, aqui só mandamos o necessário
     private Long id;
     private String nome;
     private String email;
-    private String curso;
-    private String professor;
-    private String turma;
+    private String curso;      // Nome do curso (em vez do objeto completo)
+    private String professor;  // Nome do professor
+    private String turma;      // Nome da turma
 
+    // Construtor que recebe todos os atributos do DTO
+    // Usado no AlunoController para montar as respostas personalizadas
     public AlunoDTO(Long id, String nome, String email, String curso, String professor, String turma) {
         this.id = id;
         this.nome = nome;
@@ -17,7 +23,7 @@ public class AlunoDTO {
         this.turma = turma;
     }
 
-    // Getters e Setters
+    // Getters e Setters — permitem acessar e modificar os atributos
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
