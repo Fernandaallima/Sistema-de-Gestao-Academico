@@ -169,32 +169,133 @@ async function salvarAluno(e) {
 /**
  * Preenche o formulário com os dados do aluno a ser editado.
  */
-async function editarAluno(id) {
-  const resp = await fetch(`${API_ALUNOS}/${id}`);
-  const a = await resp.json();
+// Função para mostrar mensagens tipo toast
+function showMessage(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
 
-  document.getElementById("alunoId").value = a.id;
-  document.getElementById("alunoNome").value = a.nome;
-  document.getElementById("alunoEmail").value = a.email;
-  document.getElementById("turmaSelect").value = a.turma?.id ?? "";
+  document.body.appendChild(toast);
 
-  showPage("alunos");
+  setTimeout(() => {
+      toast.remove();
+  }, 3000);
 }
+
+// Função de edição de aluno
+function editarAluno(id) {
+  fetch(`${API_ALUNOS}/${id}`)
+    .then(resp => resp.json())
+    .then(a => {
+        document.getElementById("alunoId").value = a.id;
+        document.getElementById("alunoNome").value = a.nome;
+        document.getElementById("alunoEmail").value = a.email;
+        document.getElementById("turmaSelect").value = a.turma?.id ?? "";
+
+        showPage("alunos");
+
+        showMessage("🖊️ Você está editando o aluno " + a.nome, "info");
+
+        const form = document.getElementById("formAluno");
+        form.classList.add("editing");
+
+        // Não alteramos o botão Salvar
+        // O botão Cancelar já está no HTML e chama resetAlunoForm()
+    })
+    .catch(err => {
+        console.error(err);
+        showMessage("❌ Erro ao carregar o aluno", "error");
+    });
+}
+
+function cancelarEdicaoAluno() {
+  const form = document.getElementById("formAluno");
+
+  // Limpa o formulário
+  resetAlunoForm();
+
+  // Remove destaque de edição
+  form.classList.remove("editing");
+
+  // Mostra mensagem de cancelamento
+  showMessage("✖️ Edição cancelada", "info");
+}
+
+
+
 
 /**
  * Remove um aluno após confirmação.
  * O backend já trata exclusão de notas e vínculos.
  */
 async function deletarAluno(id) {
-  if (!confirm("Excluir aluno?")) return;
+  const ok = await confirmarBonito("Excluir este aluno?");
+  if (!ok) return;
+
   await fetch(`${API_ALUNOS}/${id}`, { method: "DELETE" });
   carregarAlunos();
+
+  showMessage("🗑️ Aluno excluído com sucesso!", "success");
 }
 
-function resetAlunoForm() {
-  document.getElementById("formAluno").reset();
-  document.getElementById("alunoId").value = "";
+function confirmarBonito(msg = "Tem certeza?") {
+  return new Promise(resolve => {
+      
+      // Criar overlay
+      const overlay = document.createElement("div");
+      overlay.className = "confirm-overlay";
+
+      // Criar caixa
+      const box = document.createElement("div");
+      box.className = "confirm-box";
+
+      box.innerHTML = `
+          <h3 class="confirm-title">${msg}</h3>
+          <div class="confirm-actions">
+              <button id="cYes" class="btn primary">Sim</button>
+              <button id="cNo" class="btn ghost">Cancelar</button>
+          </div>
+      `;
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+
+      // Botões
+      box.querySelector("#cYes").onclick = () => fechar(true);
+      box.querySelector("#cNo").onclick = () => fechar(false);
+
+      function fechar(resp) {
+          overlay.classList.add("closing");
+          setTimeout(() => {
+              overlay.remove();
+              resolve(resp);
+          }, 200); // tempo da animação
+      }
+  });
 }
+
+
+
+function resetAlunoForm() {
+  const form = document.getElementById("formAluno");
+
+  // Detecta se estava editando
+  const estavaEditando = form.classList.contains("editing");
+
+  // Limpa os campos
+  form.reset();
+  document.getElementById("alunoId").value = "";
+
+  // Remove classe de edição
+  form.classList.remove("editing");
+
+  // Só mostra mensagem se realmente estava editando
+  if (estavaEditando) {
+    showMessage("✖️ Edição cancelada", "info");
+  }
+}
+
+
 
 /* ============================================================
    CRUD — CURSOS

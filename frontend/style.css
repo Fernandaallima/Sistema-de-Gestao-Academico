@@ -412,3 +412,167 @@ input:focus, select:focus{ border-color: var(--purple-2); box-shadow: 0 6px 20px
     border-radius: 50%;
     box-shadow: 0 0 8px rgba(162, 137, 255, 0.8);
 }
+
+/* ==========================
+   Formulário em edição
+   ========================== */
+   form.editing {
+    border: 2px solid #8653fd;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f3e8ff, #d1b3ff); /* claro */
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(134, 83, 253, 0.25);
+    transition: all 0.4s ease;
+  }
+  
+  /* ==========================
+     Formulário tema escuro
+     ========================== */
+  html.dark form.editing {
+    border: 2px solid #b38aff;
+    background: linear-gradient(135deg, #2b1b3b, #3d2a5a);
+    box-shadow: 0 10px 25px rgba(179, 138, 255, 0.35);
+  }
+  
+  /* ==========================
+     Toasts
+     ========================== */
+  .toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    padding: 14px 24px;
+    border-radius: 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    animation: toastIn 0.4s forwards, toastOut 0.4s 2.6s forwards;
+    z-index: 9999;
+  }
+  
+  /* Gradientes claros */
+  .toast.success { background: linear-gradient(135deg, #4ade80, #16a34a); }
+  .toast.error   { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+  .toast.info    { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+  
+  /* Gradientes dark */
+  html.dark .toast.success { background: linear-gradient(135deg, #16a34a, #065f46); }
+  html.dark .toast.error   { background: linear-gradient(135deg, #b91c1c, #7f1d1d); }
+  html.dark .toast.info    { background: linear-gradient(135deg, #1e40af, #1e3a8a); }
+  
+  /* ==========================
+     Confirm Modal
+     ========================== */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    animation: fadeIn 0.25s ease forwards;
+  }
+  
+  .confirm-box {
+    background: linear-gradient(135deg, #ffffff, #f3f0ff);
+    border-radius: 16px;
+    width: 360px;
+    padding: 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    text-align: center;
+    transform: scale(1);
+  }
+  
+  html.dark .confirm-box {
+    background: linear-gradient(135deg, #2b1b3b, #3d2a5a);
+    box-shadow: 0 15px 35px rgba(179, 138, 255, 0.25);
+  }
+  
+  .confirm-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #4b0082;
+  }
+  
+  html.dark .confirm-title {
+    color: #e0c7ff;
+  }
+  
+  .confirm-actions {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 25px;
+  }
+  
+  .confirm-actions button {
+    border: none;
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .confirm-actions .btn.primary {
+    background: linear-gradient(135deg, #8653fd, #6b34e8);
+    color: white;
+  }
+  
+  html.dark .confirm-actions .btn.primary {
+    background: linear-gradient(135deg, #b38aff, #8653fd);
+  }
+  
+  .confirm-actions .btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(134, 83, 253, 0.35);
+  }
+  
+  .confirm-actions .btn.ghost {
+    background: #f0f0ff;
+    color: #4b0082;
+    border: 1px solid #d0c6f5;
+  }
+  
+  html.dark .confirm-actions .btn.ghost {
+    background: #3b2a5c;
+    color: #d9c8ff;
+    border: 1px solid #5c4690;
+  }
+  
+  .confirm-actions .btn.ghost:hover {
+    background: #e6e0ff;
+    transform: translateY(-2px);
+  }
+  
+  .confirm-overlay.closing {
+    animation: fadeOut 0.25s ease forwards;
+  }
+  
+  /* ==========================
+     Animações
+     ========================== */
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(20px) scale(0.95); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+  
