@@ -43,13 +43,12 @@ function showPage(id) {
   }
 
   // Atualizações de turmas
-  if (id === "turmasPage") {
+if (id === "turmasPage") {
     carregarTurmas();
     carregarCursosEmSelect();
     carregarProfessoresEmSelect();
-  }
 }
-
+ }
 
 /* ============================================================
    Evento inicial — DOM completamente carregado
@@ -134,28 +133,49 @@ async function salvarAluno(e) {
   const id = document.getElementById("alunoId").value;
   const nome = document.getElementById("alunoNome").value;
   const email = document.getElementById("alunoEmail").value;
-  const turma = document.getElementById("turmaSelect").value;
+  const turmaId = document.getElementById("turmaSelect").value;
 
-  if (!nome || !email) return alert("Preencha todos os campos!");
+  if (!nome || !email || !turmaId) {
+    return alert("Preencha todos os campos!");
+  }
 
+  // ---- DEFINIÇÃO DA ROTA CORRETA ----
+  // Se está editando → PUT normal
+  // Se é novo aluno → POST /completo
   const method = id ? "PUT" : "POST";
-  const url = id ? `${API_ALUNOS}/${id}` : API_ALUNOS;
+  const url = id
+    ? `${API_ALUNOS}/${id}`
+    : `${API_ALUNOS}/completo`;
+
+  // ---- BODY CORRIGIDO ----
+  const body = id
+    ? { // PUT → backend aceita JSON completo sem problema
+        id,
+        nome,
+        email,
+        turma: { id: Number(turmaId) }
+      }
+    : { // POST /completo → EXIGE objeto turma
+        nome,
+        email,
+        turma: { id: Number(turmaId) }
+      };
 
   await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome, email, turmaId: turma }),
+    body: JSON.stringify(body),
   });
 
   // Atualiza tabela
-  carregarAlunos();
+  await carregarAlunos();
 
-  // Reseta formulário e mostra mensagem de sucesso se estava editando
+  // Limpa formulário
   resetAlunoForm({ salvo: true });
 
-  // Se for novo aluno, mostrar mensagem específica
-  if (!id) showMessage("✅ Aluno adicionado com sucesso!", "success");
+  if (!id) showMessage("✅ Aluno criado com sucesso!", "success");
 }
+
 
 
 /**

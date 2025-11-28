@@ -15,19 +15,26 @@ async function carregarTurmas() {
         tbody.innerHTML = "";
 
         lista.forEach(t => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${t.id}</td>
-                    <td>${t.nome}</td>
-                    <td>${t.curso?.nome ?? "-"}</td>
-                    <td>${t.professor?.nome ?? "-"}</td>
-                    <td>
-                        <button class="btn-table btn-edit" onclick="editarTurma(${t.id})">✏️</button>
-                        <button class="btn-table btn-delete" onclick="deletarTurma(${t.id})">🗑️</button>
-                    </td>
-                </tr>
-            `;
-        });
+    const qtd = t.alunos ? t.alunos.length : 0;
+
+    tbody.innerHTML += `
+        <tr>
+            <td>${t.id}</td>
+            <td>${t.nome}</td>
+            <td>${t.curso?.nome ?? "-"}</td>
+            <td>${t.professor?.nome ?? "-"}</td>
+            <td>
+                <button class="btn-table btn-edit" onclick="editarTurma(${t.id})">✏️</button>
+
+                <button class="btn-table btn-delete"
+                    onclick="deletarTurma(${t.id}, ${qtd})">
+                    🗑️
+                </button>
+            </td>
+        </tr>
+    `;
+});
+
 
         carregarCursosEmSelect();
         carregarProfessoresEmSelect();
@@ -37,6 +44,7 @@ async function carregarTurmas() {
         alert("Erro ao carregar turmas.");
     }
 }
+
 
 
 /* ---------- SELECT CURSOS ---------- */
@@ -139,20 +147,36 @@ async function editarTurma(id) {
 }
 
 
+
 /* ---------- EXCLUIR ---------- */
-async function deletarTurma(id) {
+async function deletarTurma(id, qtdAlunos) {
+
+    if (qtdAlunos > 0) {
+        showMessage("❌ Esta turma possui alunos cadastrados e não pode ser excluída!", "error");
+        return;
+    }
+
     const ok = await confirmarBonito("Deseja realmente excluir esta turma?");
     if (!ok) return;
 
     try {
-        const resp = await fetch(`${API_TURMAS}/${id}`, { method: "DELETE" });
+        const resp = await fetch(`${API_TURMAS}/${id}`, {
+            method: "DELETE",
+            cache: "no-store"
+        });
+
         if (!resp.ok) throw new Error("Erro ao excluir turma");
 
-        // Atualiza tabelas corretamente
-        carregarTurmas();
-        carregarAlunos();          // Atualiza lista de alunos
-        carregarTurmasSelect();    // Atualiza select de turmas
+        // 🔥 Primeiro atualiza turmas (tira do cache)
+        await carregarTurmas();
+
+        // Atualiza dropdowns
+        carregarDropdownTurmas();
+        carregarDropdownAlunos();
+        carregarDropdownNotas();
+
         showMessage("🗑️ Turma excluída com sucesso!", "success");
+
     } catch (e) {
         console.error(e);
         showMessage("❌ Erro ao excluir turma", "error");
@@ -160,10 +184,10 @@ async function deletarTurma(id) {
 }
 
 
-
 function cancelarEdicaoTurma() {
     resetTurmaForm({ cancelado: true });
 }
+
 
 
 /* ---------- RESET ---------- */
@@ -183,8 +207,6 @@ function resetTurmaForm({ cancelado = false, salvo = false } = {}) {
         showMessage("✅ Edição salva com sucesso!", "success");
     }
 }
-
-
 
 
 /* ---------- Atualiza dropdowns de turmas ---------- */

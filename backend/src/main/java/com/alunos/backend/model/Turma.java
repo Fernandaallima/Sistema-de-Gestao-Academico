@@ -1,5 +1,6 @@
 package com.alunos.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -23,11 +24,9 @@ public class Turma {
     @JsonIgnoreProperties({"turmas"}) // Evita loop JSON
     private Professor professor;
 
-    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL) // Uma turma tem vários alunos
-    @JsonIgnoreProperties({"turma"}) // Ignora turma dentro de aluno
-    @com.fasterxml.jackson.annotation.JsonIgnore // Evita serializar alunos
+    @OneToMany(mappedBy = "turma", cascade = CascadeType.PERSIST)
+    @JsonIgnoreProperties({"turma"}) // impede loop
     private List<Aluno> alunos;
-
 
     @OneToMany(
             mappedBy = "turma",
