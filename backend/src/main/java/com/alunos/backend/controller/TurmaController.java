@@ -93,29 +93,23 @@ public class TurmaController {
     @Transactional
     public void excluir(@PathVariable Long id) {
 
-        // Busca a turma no banco
         Turma turma = turmaRepository.findById(id).orElse(null);
         if (turma == null) return;
 
-        // 1) Buscar todos os alunos vinculados à turma
+        // 1) Apagar TODAS as notas vinculadas à turma
+        notaRepository.deleteByTurmaId(id);
+
+        // 2) Buscar alunos e desvincular
         List<Aluno> alunos = alunoRepository.findByTurma_Id(id);
-
-        // 2) Para cada aluno: deletar notas associadas
         for (Aluno aluno : alunos) {
-
-            // Apagar todas as notas do aluno
-            notaRepository.findByAlunoId(aluno.getId())
-                    .forEach(n -> notaRepository.deleteById(n.getId()));
-
-            // 3) Desvincular o aluno da turma
             aluno.setTurma(null);
             alunoRepository.save(aluno);
         }
 
-        // 4) Agora é seguro deletar a turma,
-        // pois nenhum aluno nem nota está referenciando ela
+        // 3) Agora é seguro deletar a turma
         turmaRepository.deleteById(id);
     }
+
 
     // ------------------------------------------------------------
     // CRIAR TURMA COMPLETA — COM CURSO E PROFESSOR VINCULADOS

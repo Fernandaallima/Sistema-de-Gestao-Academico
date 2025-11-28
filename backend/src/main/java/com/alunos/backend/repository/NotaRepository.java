@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface NotaRepository extends JpaRepository<Nota, Long> {
 
-    List<Nota> findByTurmaId(Long turmaId); // Busca notas pelo ID da turma
+    List<Nota> findByTurmaId(Long turmaId);  // Buscar todas as notas daquela turma
 
-    List<Nota> findByAlunoId(Long alunoId); // Busca notas pelo ID do aluno
+    List<Nota> findByAlunoId(Long alunoId);  // Buscar notas de um aluno específico
+
+    void deleteByTurmaId(Long turmaId);      // 🔥 Deletar todas notas pelo turma_id
 }

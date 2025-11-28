@@ -1,7 +1,6 @@
 package com.alunos.backend.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
@@ -15,11 +14,13 @@ public class Nota {
     // vincula a nota ao aluno
     @ManyToOne // Muitas notas podem ser do mesmo aluno
     @JoinColumn(name = "aluno_id") // FK aluno_id
+    @JsonIgnoreProperties({"turma"}) // ← adicionado para evitar loop
     private Aluno aluno;
 
     // vincula a nota à turma
     @ManyToOne // Muitas notas podem ser de uma mesma turma
     @JoinColumn(name = "turma_id") // FK turma_id
+    @JsonIgnoreProperties({"alunos", "notas"}) // ← adicionado para evitar loop
     private Turma turma;
 
     private Double nota1; // Primeira nota

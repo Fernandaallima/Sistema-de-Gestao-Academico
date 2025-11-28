@@ -1,31 +1,32 @@
 package com.alunos.backend.controller;
 
 import com.alunos.backend.model.Professor;
+import com.alunos.backend.model.Turma;          // ✔ IMPORTANTE
 import com.alunos.backend.repository.ProfessorRepository;
+import com.alunos.backend.repository.TurmaRepository;  // ✔ IMPORTANTE
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 
-// Indica que esta classe é um controller REST (responde com JSON)
 @RestController
-
-// Libera o acesso CORS para o frontend
 @CrossOrigin(origins = "*")
-
-// Define o caminho base dos endpoints: /professores
 @RequestMapping("/professores")
 public class ProfessorController {
 
-    // Injeta automaticamente o repositório de professor
     @Autowired
     private ProfessorRepository repo;
+
+    @Autowired
+    private TurmaRepository turmaRepository;   //  NECESSÁRIO PARA DESVINCULAR AS TURMAS
 
     // -----------------------------------
     // LISTAR TODOS OS PROFESSORES
     // -----------------------------------
     @GetMapping
     public List<Professor> listar() {
-        // Retorna todos os registros da tabela professor
         return repo.findAll();
     }
 
@@ -34,7 +35,6 @@ public class ProfessorController {
     // -----------------------------------
     @PostMapping
     public Professor criar(@RequestBody Professor p) {
-        // Salva o professor enviado no corpo da requisição
         return repo.save(p);
     }
 
@@ -43,10 +43,7 @@ public class ProfessorController {
     // -----------------------------------
     @PutMapping("/{id}")
     public Professor editar(@PathVariable Long id, @RequestBody Professor p) {
-        // Garante que o ID enviado na URL será aplicado no objeto
         p.setId(id);
-
-        // Atualiza os dados no banco
         return repo.save(p);
     }
 
@@ -54,17 +51,31 @@ public class ProfessorController {
     // EXCLUIR UM PROFESSOR POR ID
     // -----------------------------------
     @DeleteMapping("/{id}")
+    @Transactional
     public void deletar(@PathVariable Long id) {
-        // Remove o registro correspondente ao ID
+
+        // 1) Buscar professor
+        Professor professor = repo.findById(id).orElse(null);
+        if (professor == null) return;
+
+        // 2) Buscar turmas vinculadas ao professor
+        List<Turma> turmas = turmaRepository.findByProfessor_Id(id);
+
+        // 3) Para cada turma: desvincular professor
+        for (Turma t : turmas) {
+            t.setProfessor(null);
+            turmaRepository.save(t);
+        }
+
+        // 4) Agora o professor pode ser excluído sem erro
         repo.deleteById(id);
     }
 
     // -----------------------------------
-    // BUSCAR UM PROFESSOR PELO ID
+    // BUSCAR PROFESSOR POR ID
     // -----------------------------------
     @GetMapping("/{id}")
     public Professor buscarPorId(@PathVariable Long id) {
-        // Retorna o professor ou null caso não exista
         return repo.findById(id).orElse(null);
     }
 

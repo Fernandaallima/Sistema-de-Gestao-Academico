@@ -15,9 +15,10 @@ async function carregarTurmas() {
         tbody.innerHTML = "";
 
         lista.forEach(t => {
-    const qtd = t.alunos ? t.alunos.length : 0;
+            const qtd = Array.isArray(t.alunos) ? t.alunos.length : 0;
 
-    tbody.innerHTML += `
+
+            tbody.innerHTML += `
         <tr>
             <td>${t.id}</td>
             <td>${t.nome}</td>
@@ -33,7 +34,7 @@ async function carregarTurmas() {
             </td>
         </tr>
     `;
-});
+        });
 
 
         carregarCursosEmSelect();
